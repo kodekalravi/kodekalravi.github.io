@@ -220,28 +220,53 @@
       return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
     }
 
-    function render(filter) {
-      const list = models
-        .map((m, i) => ({ ...m, p: palettes[i % palettes.length] }))
-        .filter(m => filter === "all" || m.group === filter);
+    const photoCache = {};
 
-      grid.innerHTML = list.map(m => `
-        <article class="card" style="--g:${m.p.g}; --accent:${m.p.a}">
-          <div class="portrait">
-            <span class="initial" aria-hidden="true">${esc(m.name.charAt(0))}</span>
-            ${m.photo ? `<img src="${esc(m.photo)}" alt="Portrait of ${esc(m.name)}" loading="lazy">` : ""}
-          </div>
-          <div class="meta">
-            <h2>${esc(m.name)}</h2>
-            <p class="role">${esc(m.role)}</p>
-            <p class="fact">${esc(m.fact)}</p>
-          </div>
-        </article>
-      `).join("");
+async function getPhoto(m) {
+  if (m.photo) return m.photo;
+  const title = m.name.replace(/ /g, "_");
+  if (photoCache[title] !== undefined) return photoCache[title];
+  try {
+    const r = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(title));
+    const d = await r.json();
+    photoCache[title] = (d.thumbnail && d.thumbnail.source) || "";
+  } catch (e) {
+    photoCache[title] = "";
+  }
+  return photoCache[title];
+}
 
-      count.textContent = list.length + (list.length === 1 ? " model" : " models");
-      empty.style.display = list.length ? "none" : "block";
+function render(filter) {
+  const list = models
+    .map((m, i) => ({ ...m, p: palettes[i % palettes.length] }))
+    .filter(m => filter === "all" || m.group === filter);
+
+  grid.innerHTML = list.map((m, i) => `
+    <article class="card" style="--g:${m.p.g}; --accent:${m.p.a}">
+      <div class="portrait">
+        <span class="initial" aria-hidden="true">${esc(m.name.charAt(0))}</span>
+        <img id="img-${i}" alt="Portrait of ${esc(m.name)}">
+      </div>
+      <div class="meta">
+        <h2>${esc(m.name)}</h2>
+        <p class="role">${esc(m.role)}</p>
+        <p class="fact">${esc(m.fact)}</p>
+      </div>
+    </article>
+  `).join("");
+
+  list.forEach(async (m, i) => {
+    const src = await getPhoto(m);
+    const img = document.getElementById("img-" + i);
+    if (src && img) {
+      img.onload = () => img.classList.add("ready");
+      img.src = src;
     }
+  });
+
+  count.textContent = list.length + (list.length === 1 ? " model" : " models");
+  empty.style.display = list.length ? "none" : "block";
+}
 
     chips.forEach(chip => chip.addEventListener("click", () => {
       chips.forEach(c => c.setAttribute("aria-pressed", String(c === chip)));
