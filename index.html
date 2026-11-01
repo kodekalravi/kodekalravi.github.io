@@ -3,21 +3,251 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My First Webpage</title>
+  <title>Faces of Indian Fashion</title>
+  <meta name="description" content="A showcase of celebrated Indian models, from 1990s supermodels to pageant winners and runway icons.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,500;0,700;1,500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 0 20px;
-      line-height: 1.6;
-      color: #222;
+    :root {
+      --bg: #F4F2F8;
+      --ink: #26112F;
+      --muted: #6B5A75;
+      --marigold: #F2A900;
+      --peacock: #0E7C86;
+      --rose: #C2185B;
+      --card: #FFFFFF;
+      --serif: "Bodoni Moda", "Didot", Georgia, serif;
+      --sans: "DM Sans", "Segoe UI", Arial, sans-serif;
     }
-    h1 { color: #2563eb; }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #17091D;
+        --ink: #F4EEF7;
+        --muted: #B6A5C0;
+        --card: #231230;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid var(--marigold); outline-offset: 3px; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(56px, 10vw, 120px) clamp(20px, 6vw, 80px) clamp(40px, 6vw, 72px);
+      background: #26112F;
+      color: #F8F1FA;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      right: -8vw; top: -12vw;
+      width: 46vw; height: 46vw;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--marigold), #E0561B 70%);
+      opacity: .92;
+    }
+    .hero-inner { position: relative; max-width: 1200px; margin: 0 auto; }
+    .hero h1 {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: clamp(3rem, 11vw, 8.5rem);
+      line-height: .92;
+      letter-spacing: -0.02em;
+    }
+    .hero h1 em { font-weight: 500; display: block; }
+    .hero p {
+      margin-top: 28px;
+      max-width: 46ch;
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      color: #E3D3EA;
+    }
+
+    .bar {
+      position: sticky; top: 0; z-index: 5;
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+    }
+    .bar-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 14px clamp(20px, 6vw, 80px);
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    }
+    .bar-inner span { color: var(--muted); font-size: .9rem; margin-right: 6px; }
+    .chip {
+      font: inherit; font-weight: 500;
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 1.5px solid var(--ink);
+      background: transparent; color: var(--ink);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .chip:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); }
+    .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+    main { max-width: 1200px; margin: 0 auto; padding: 48px clamp(20px, 6vw, 80px) 80px; }
+    .count { color: var(--muted); margin-bottom: 28px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 32px 24px;
+    }
+    .card { display: flex; flex-direction: column; }
+    .portrait {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      border-radius: 140px 140px 6px 6px;
+      background: var(--g);
+      display: grid; place-items: center;
+    }
+    .portrait .initial {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: clamp(6rem, 12vw, 9rem);
+      color: rgba(255,255,255,.9);
+      line-height: 1;
+    }
+    .portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .meta { padding: 16px 4px 0; }
+    .meta h2 {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 1.5rem;
+      line-height: 1.15;
+    }
+    .role { color: var(--muted); font-size: .95rem; margin-top: 4px; }
+    .fact {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 2px solid var(--accent);
+      font-size: .95rem;
+    }
+    .empty { display: none; padding: 60px 0; text-align: center; color: var(--muted); }
+
+    footer {
+      padding: 32px clamp(20px, 6vw, 80px) 48px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .9rem;
+      border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+    }
+
+    @media (max-width: 520px) {
+      .grid { grid-template-columns: 1fr 1fr; gap: 24px 14px; }
+      .portrait { border-radius: 90px 90px 6px 6px; }
+      .portrait .initial { font-size: 4.5rem; }
+      .meta h2 { font-size: 1.15rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .chip { transition: none; }
+    }
   </style>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <p>This is my first webpage, hosted for free.</p>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>Faces of <em>Indian Fashion</em></h1>
+      <p>Supermodels, pageant winners and runway icons who put Indian style on the world stage.</p>
+    </div>
+  </header>
+
+  <nav class="bar" aria-label="Filter models">
+    <div class="bar-inner">
+      <span>Show:</span>
+      <button class="chip" data-filter="all" aria-pressed="true">Everyone</button>
+      <button class="chip" data-filter="women" aria-pressed="false">Women</button>
+      <button class="chip" data-filter="men" aria-pressed="false">Men</button>
+    </div>
+  </nav>
+
+  <main>
+    <p class="count" id="count" aria-live="polite"></p>
+    <section class="grid" id="grid" aria-label="Models"></section>
+    <p class="empty" id="empty">No models in this group yet. Add one in the list inside index.html.</p>
+  </main>
+
+  <footer>
+    Information is a brief summary of public records. Photos are not included; add your own in the list inside index.html.
+  </footer>
+
+  <script>
+    /* EDIT THIS LIST to add, remove or change models.
+       photo: image file name or link you have the right to use. "" shows a colored initial.
+       group: "women" or "men" */
+    const models = [
+      { name: "Milind Soman",    group: "men",   role: "Model, actor and endurance athlete", fact: "A defining male face of 1990s Indian fashion and an Ironman finisher.", photo: "" },
+      { name: "Arjun Rampal",    group: "men",   role: "Model turned actor",                 fact: "Began as a runway and ad model before moving into films.", photo: "" },
+      { name: "Candice Pinto",   group: "women", role: "Pioneering supermodel",              fact: "One of the first Indian models to become a household name in the 1990s.", photo: "" },
+      { name: "Madhu Sapre",     group: "women", role: "Supermodel and pageant finalist",    fact: "First runner-up at Miss Universe 1992.", photo: "" },
+      { name: "Aishwarya Rai",   group: "women", role: "Model and actress",                  fact: "Crowned Miss World in 1994.", photo: "" },
+      { name: "Sushmita Sen",    group: "women", role: "Model and actress",                  fact: "Crowned Miss Universe in 1994, a first for India.", photo: "" },
+      { name: "Diana Hayden",    group: "women", role: "Model and television host",          fact: "Crowned Miss World in 1997.", photo: "" },
+      { name: "Lara Dutta",      group: "women", role: "Model and actress",                  fact: "Crowned Miss Universe in 2000.", photo: "" },
+      { name: "Priyanka Chopra", group: "women", role: "Pageant winner turned global star",  fact: "Crowned Miss World in 2000.", photo: "" },
+      { name: "Lisa Haydon",     group: "women", role: "Model and actress",                  fact: "Known for magazine covers and high-fashion campaigns.", photo: "" },
+      { name: "Manushi Chhillar",group: "women", role: "Model and actress",                  fact: "Crowned Miss World in 2017.", photo: "" },
+      { name: "Harnaaz Sandhu",  group: "women", role: "Model and actress",                  fact: "Crowned Miss Universe in 2021.", photo: "" }
+    ];
+
+    const palettes = [
+      { g: "linear-gradient(160deg,#C2185B,#6A1B4D)", a: "#C2185B" },
+      { g: "linear-gradient(160deg,#0E7C86,#0B3F5C)", a: "#0E7C86" },
+      { g: "linear-gradient(160deg,#F2A900,#D9480F)", a: "#F2A900" },
+      { g: "linear-gradient(160deg,#5B3A9E,#26112F)", a: "#5B3A9E" }
+    ];
+
+    const grid = document.getElementById("grid");
+    const count = document.getElementById("count");
+    const empty = document.getElementById("empty");
+    const chips = document.querySelectorAll(".chip");
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+    }
+
+    function render(filter) {
+      const list = models
+        .map((m, i) => ({ ...m, p: palettes[i % palettes.length] }))
+        .filter(m => filter === "all" || m.group === filter);
+
+      grid.innerHTML = list.map(m => `
+        <article class="card" style="--g:${m.p.g}; --accent:${m.p.a}">
+          <div class="portrait">
+            <span class="initial" aria-hidden="true">${esc(m.name.charAt(0))}</span>
+            ${m.photo ? `<img src="${esc(m.photo)}" alt="Portrait of ${esc(m.name)}" loading="lazy">` : ""}
+          </div>
+          <div class="meta">
+            <h2>${esc(m.name)}</h2>
+            <p class="role">${esc(m.role)}</p>
+            <p class="fact">${esc(m.fact)}</p>
+          </div>
+        </article>
+      `).join("");
+
+      count.textContent = list.length + (list.length === 1 ? " model" : " models");
+      empty.style.display = list.length ? "none" : "block";
+    }
+
+    chips.forEach(chip => chip.addEventListener("click", () => {
+      chips.forEach(c => c.setAttribute("aria-pressed", String(c === chip)));
+      render(chip.dataset.filter);
+    }));
+
+    render("all");
+  </script>
 </body>
 </html>
