@@ -222,18 +222,30 @@
 
     const photoCache = {};
 
+async function wikiImage(params) {
+  const url = "https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=600&" + params;
+  const r = await fetch(url);
+  const d = await r.json();
+  const pages = d.query && d.query.pages ? Object.values(d.query.pages) : [];
+  pages.sort((a, b) => (a.index || 0) - (b.index || 0));
+  for (const p of pages) {
+    if (p.thumbnail) return p.thumbnail.source;
+  }
+  return "";
+}
+
 async function getPhoto(m) {
   if (m.photo) return m.photo;
-  const title = m.name.replace(/ /g, "_");
-  if (photoCache[title] !== undefined) return photoCache[title];
+  if (photoCache[m.name] !== undefined) return photoCache[m.name];
+  let src = "";
   try {
-    const r = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(title));
-    const d = await r.json();
-    photoCache[title] = (d.thumbnail && d.thumbnail.source) || "";
-  } catch (e) {
-    photoCache[title] = "";
-  }
-  return photoCache[title];
+    src = await wikiImage("titles=" + encodeURIComponent(m.name));
+    if (!src) {
+      src = await wikiImage("generator=search&gsrlimit=1&gsrsearch=" + encodeURIComponent(m.name + " Indian model"));
+    }
+  } catch (e) {}
+  photoCache[m.name] = src;
+  return src;
 }
 
 function render(filter) {
